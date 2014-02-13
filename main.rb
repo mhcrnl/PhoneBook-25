@@ -1,20 +1,14 @@
 module CM
 
 require "./record"
+require "./merge"
 
   class PhoneBook
-    attr_reader :selected, :deleted
-    def initialize
-      @phone_book = [
-        Record.new({first_name: "Georgi", last_name: "Dimitrov", mobile: ["0883463293"], email: ["dimitrov@abv.bg"], age: 23, nick_name: "gogo"},[:first_name, :last_name, :nick_name, :mobile, :home, :email, :birthdate, :age, :address, :note]),
-        Record.new({first_name: "Atanas", last_name: "Ivanov", mobile: ["0893325400"], email: ["atanas@abv.bg"], age: 33},[:first_name, :last_name, :nick_name, :mobile, :home, :email, :birthdate, :age, :address, :note]),
-        Record.new({first_name: "Georgi", last_name: "Dimitrov", mobile: ["0883425401"], email: ["gosho@abv.bg"], age: 13},[:first_name, :last_name, :nick_name, :mobile, :home, :email, :birthdate, :age, :address, :note]),
-        Record.new({first_name: "Atanas", last_name: "Stoqnov", mobile: ["0883325400", "0896382263"], email: ["stoqnov@abv.bg"], age: 43},[:first_name, :last_name, :nick_name, :mobile, :home, :email, :birthdate, :age, :address, :note])
-        ]
+    attr_reader :selected, :deleted, :phone_book
+    def initialize(phone_book = [])
+      @phone_book = phone_book
       @selected = nil
-      @parameters = [:first_name, :last_name, :nick_name, :mobile, :home,
-                     :email, :birthdate, :age, :address, :note
-                    ]
+      @parameters = %i(first_name last_name nick_name mobile home email birthdate age address note)
       @deleted = []
     end
 
@@ -96,19 +90,18 @@ require "./record"
         position == 0 ? "No deleted records" : "Deleted records are less than #{position + 1}"
       else
         result = add_contact @deleted[position].record
-        result == "Contact added succsessfuly" ? @deleted.delete(@deleted[position]) : result
+        result == "Contact added succsessfuly" ? @deleted.delete(sort_phone_book(@deleted)[position]) : result
       end
-    end
-
-    def input
-      puts "get mi something"
-      a = gets.chomp
-      puts a
     end
   end
 end
 
-a = CM::PhoneBook.new
+a = CM::PhoneBook.new [
+        Record.new({first_name: "Georgi", last_name: "Dimitrov", mobile: ["0883463293"], email: ["dimitrov@abv.bg"], age: 23, nick_name: "gogo"},[:first_name, :last_name, :nick_name, :mobile, :home, :email, :birthdate, :age, :address, :note]),
+        Record.new({first_name: "Atanas", last_name: "Ivanov", mobile: ["0893325400"], email: ["atanas@abv.bg"], age: 33},[:first_name, :last_name, :nick_name, :mobile, :home, :email, :birthdate, :age, :address, :note]),
+        Record.new({first_name: "Georgi", last_name: "Dimitrov", mobile: ["0883425401"], email: ["gosho@abv.bg"], age: 13},[:first_name, :last_name, :nick_name, :mobile, :home, :email, :birthdate, :age, :address, :note]),
+        Record.new({first_name: "Atanas", last_name: "Stoqnov", mobile: ["0883325400", "0896382263"], email: ["stoqnov@abv.bg"], age: 43},[:first_name, :last_name, :nick_name, :mobile, :home, :email, :birthdate, :age, :address, :note])
+        ]
 # a.add_contact( mobile: 3456, email: "dad", note: "ahaaaa", last_name: "todor")
 a.add_contact(first_name: "pesho", mobile: 3456, email: "dad", note: "ahaaaa", last_name: "todorov")
 puts a.show
@@ -119,19 +112,19 @@ puts a.show
 # puts a.show_selected
 a.select(first_name: "pesho")
 a.delete_record
-puts a.show
-a.delete_record
+# puts a.show
+# a.delete_record
 a.restore
-puts a.show a.deleted
+# puts a.show a.deleted
+# puts a.show
+b = CM::PhoneBook.new [
+        Record.new({first_name: "Gencho", last_name: "Dimitrov", mobile: ["0883493293"], email: ["gencho@abv.bg"], age: 23, nick_name: "gega"},
+                   [:first_name, :last_name, :nick_name, :mobile, :home, :email, :birthdate, :age, :address, :note]),
+        Record.new({first_name: "Toshko", last_name: "Toshkov", mobile: ["0883463293"], email: ["toshi@abv.bg"], age: 25},
+                   [:first_name, :last_name, :nick_name, :mobile, :home, :email, :birthdate, :age, :address, :note])
+      ]
+c = Merger.new.merge a, b
 puts a.show
-
-
-
-# def find_duplicate(mobile, email)
-#     [{email: [1,2,3], mobile: [11,12,13]},
-#     {email: [1,2,3,4], mobile: [11,12,13,14]},
-#     {email: [1,2,3], mobile: [11,12,13,14]},
-#     {email: [1,2,3], mobile: [11,12,13]}].select do |contact|
-#       !(contact[:email] & email).empty? or !(contact[:mobile] & mobile).empty?
-#     end
-#   end
+puts b.show
+puts c.show
+Merger

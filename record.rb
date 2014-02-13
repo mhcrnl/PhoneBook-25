@@ -1,6 +1,6 @@
 class Record
 
-  attr_reader :record
+  attr_reader :record, :parameters
 
   def initialize(record, parameters)
     @record = record
