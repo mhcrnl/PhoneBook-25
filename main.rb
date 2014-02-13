@@ -3,6 +3,7 @@ module CM
 require "./record"
 require "./merge"
 
+
   class PhoneBook
     attr_reader :selected, :deleted, :phone_book
     def initialize(phone_book = [])
@@ -127,4 +128,3 @@ c = Merger.new.merge a, b
 puts a.show
 puts b.show
 puts c.show
-Merger

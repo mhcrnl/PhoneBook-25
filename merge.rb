@@ -4,7 +4,7 @@ class Merger
   end
 
   def merge(first, second)
-    @merged = PhoneBook.new
+    @merged = ::CM::PhoneBook.new
     first.phone_book.each { |contact| @merged.add_contact contact.record }
 
     second.phone_book.each do |contact|
