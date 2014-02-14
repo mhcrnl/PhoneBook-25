@@ -2,6 +2,7 @@ module CM
 
 require "./record"
 require "./merge"
+require "./save_phone_book"
 
 
   class PhoneBook
@@ -39,7 +40,7 @@ require "./merge"
       elsif list.length == 1
         list.first.show # shows whole info
       else
-        show(list) # shows only headlines
+        show list # shows only headlines
       end
     end
 
@@ -80,7 +81,7 @@ require "./merge"
       if @selected
         @phone_book.delete @selected
         @deleted.insert 0, @selected
-        @selected = nil
+        diselect
       else
         "No selected contact"
       end
@@ -94,6 +95,11 @@ require "./merge"
         result == "Contact added succsessfuly" ? @deleted.delete(sort_phone_book(@deleted)[position]) : result
       end
     end
+
+    def diselect
+      @selected = nil
+    end
+
   end
 end
 
@@ -124,7 +130,12 @@ b = CM::PhoneBook.new [
         Record.new({first_name: "Toshko", last_name: "Toshkov", mobile: ["0883463293"], email: ["toshi@abv.bg"], age: 25},
                    [:first_name, :last_name, :nick_name, :mobile, :home, :email, :birthdate, :age, :address, :note])
       ]
-c = Merger.new.merge a, b
-puts a.show
+# c = Merger.new.merge a, b
+# puts a.show
 puts b.show
-puts c.show
+# puts c.show
+book = Save.new b.phone_book, "phone_book"
+book.save
+b = 2
+b = book.load_phone_book
+puts b.show

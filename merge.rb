@@ -49,7 +49,6 @@ class Merger
 
     changes = gets.strip.split(" ").map { |record| record.to_sym }
     until (changes - new_contact.parameters).size == 0
-      puts changes
       puts "Some parameters are incorrect: #{changes.join(", ").to_s}"
       changes = gets.strip.split(" ").map { |record| record.to_sym }
     end
