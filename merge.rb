@@ -57,10 +57,7 @@ class Merger
   end
 
   def extract_records(duplicate, new_contact, changes)
-    join_record = {
-      email:  (duplicate.record[:email] + new_contact.record[:email]).uniq,
-      mobile: (duplicate.record[:mobile] + new_contact.record[:mobile]).uniq
-      }
+    join_record = required_record_joiner(duplicate, new_contact, changes)
 
     changes.each { |key| join_record[key] = new_contact.record[key] }
     (duplicate.record.keys - changes - [:email, :mobile]).each { |key| join_record[key] = duplicate.record[key] }
@@ -68,4 +65,28 @@ class Merger
     @merged.add_contact join_record
     puts "The new record is:\n#{@merged.phone_book.last.show}"
   end
+
+  def required_record_joiner(duplicate, new_contact, changes)
+    if changes.include? :email or changes.include? :mobile
+      if changes.include? :email and changes.include? :mobile
+        {
+          email: new_contact.record[:email],
+          mobile: new_contact.record[:mobile]
+        }
+      else
+        choosen = (changes & [:email]).empty? ? :mobile : :email
+        unchoosen = ([:email, :mobile] - [choosen]).first
+        {
+          unchoosen => (duplicate.record[unchoosen] + new_contact.record[unchoosen]).uniq,
+          choosen => new_contact.record[choosen]
+        }
+      end
+    else
+      {
+        email:  (duplicate.record[:email] + new_contact.record[:email]).uniq,
+        mobile: (duplicate.record[:mobile] + new_contact.record[:mobile]).uniq
+      }
+    end
+  end
+
 end

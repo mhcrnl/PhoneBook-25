@@ -1,16 +1,9 @@
 class Save
 
   require "json"
-  # attr_reader
 
-  def initialize(object, file_name)
-    @object = object
-    # @option = option
-    @file_name = file_name
-  end
-
-  def save
-    objects = @object.map do |contact|
+  def self.save_phone_book(object, file_name)
+    objects = object.phone_book.map do |contact|
       record = contact.record
       record[:parameters] = contact.parameters
       record
@@ -19,13 +12,15 @@ class Save
     File.open("./#{@file_name}.json","w") do |f|
       f.write(JSON.pretty_generate(objects))
     end
+
+    file_name
   end
 
-  def load_phone_book
+  def self.load_phone_book(file_name)
     loaded = JSON.parse(IO.read "./#{@file_name}.json").map do |json_hash|
       new_hash = {}
       json_hash.each { |key, value| new_hash[key.to_sym] = value }
-      parameters = new_hash[:parameters]
+      parameters = new_hash[:parameters].map { |value| value.to_sym }
       new_hash[:parameters] = nil
       Record.new new_hash, parameters
     end
