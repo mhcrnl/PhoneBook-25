@@ -1,6 +1,8 @@
-class Merger
-  def initialize
+class MergeControler
+  def initialize(console: false, gui: false)
     @options = %i(first second merge)
+    @console = console
+    @gui = gui
   end
 
   def merge(first, second)
@@ -12,14 +14,40 @@ class Merger
       if duplicate.empty?
         @merged.add_contact contact.record
       else
-        collision_handler_output(duplicate.first, contact)
+        if @console
+          console_hendler(duplicate.first, contact)
+        elsif @gui
+          gui_handler(duplicate.first, new_contact)
+        else
+          return "Choose controler"
+        end
       end
     end
 
     @merged
   end
 
-  def collision_handler_output(duplicate, new_contact)
+  def console_hendler(duplicate, contact)
+    user_option = user_option_input(duplicate, contact)
+    if user_option == :merge
+      user_changes = user_changes_input(duplicate, contact)
+      extract_records(duplicate, contact, user_changes)
+    else
+      puts collision_handler(duplicate, contact, user_option)
+    end
+  end
+
+  def gui_hendler(duplicate, contact)
+    user_option = gets
+    if user_option == :merge
+      user_changes = gets
+      puts extract_records(duplicate, contact, changes)
+    else
+      collision_handler(duplicate, contact, user_option)
+    end
+  end
+
+  def user_option_input(duplicate, new_contact)
     puts "#{duplicate.headline.strip} duplicates with #{new_contact.headline}"
     puts "Select one of this options: #{@options.join(", ").to_s}\n"
 
@@ -29,24 +57,22 @@ class Merger
        option = gets.chomp.to_sym
     end
 
-    collision_handler(duplicate, new_contact, option)
+    option
   end
 
   def collision_handler(duplicate, new_contact, option)
     case option
       when :first
-        puts "Did't add\n#{new_contact.headline}"
+        return "Did't add\n#{new_contact.headline}"
       when :second
-        puts "Repleced #{duplicate.headline.strip} with #{new_contact.headline}"
         @merged.phone_book.delete duplicate
         @merged.add_contact new_contact.record
-      when :merge
-        join_records(duplicate, new_contact)
+        return "Repleced #{duplicate.headline.strip} with #{new_contact.headline}"
     end
   end
 
-  def join_records(duplicate, new_contact)
-    puts "Chouse which record from:\n"
+  def user_changes_input(duplicate, new_contact)
+    puts "Choose which record from:\n"
     puts "#{new_contact.show}\nto replace in\n"
     puts "#{duplicate.show}"
 
@@ -56,7 +82,7 @@ class Merger
       changes = gets.strip.split(" ").map { |record| record.to_sym }
     end
 
-    extract_records(duplicate, new_contact, changes)
+    changes
   end
 
   def extract_records(duplicate, new_contact, changes)
@@ -67,7 +93,7 @@ class Merger
     (duplicate.record.keys - changes - [:email, :mobile]).each { |key| join_record[key] = duplicate.record[key] }
 
     @merged.add_contact join_record
-    puts "The new record is:\n#{@merged.phone_book.last.show}"
+    return "The new record is:\n#{@merged.phone_book.last.show}"
   end
 
   def required_record_joiner(duplicate, new_contact, changes)
@@ -92,5 +118,4 @@ class Merger
       }
     end
   end
-
 end

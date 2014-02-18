@@ -3,6 +3,7 @@ module ContactMenager
 require "./record"
 require "./merge"
 require "./save_phone_book"
+require "./merge_controler"
 
 
   class PhoneBook
@@ -145,10 +146,12 @@ b = ContactMenager::PhoneBook.new [
         Record.new({first_name: "Toshko", last_name: "Toshkov", mobile: ["0883463293"], email: ["toshi@abv.bg", "toshko@gmail.com"], age: 25},
                    [:first_name, :last_name, :nick_name, :mobile, :home, :email, :birthdate, :age, :address, :note])
       ]
-c = Merger.new.merge a, b
+c = MergeControler.new(console: true).merge a, b
 # puts a.show
 # puts b.show
 puts c.show
+c.select nick_name: "gonzo"
+puts c.show_selected
 # my_book = Save.save_phone_book a, "first_test_phone_book"
 # a = 2
 # a = Save.load_phone_book my_book
