@@ -1,0 +1,50 @@
+[
+  {
+    "first_name": "Gencho",
+    "last_name": "Dimitrov",
+    "mobile": [
+      "0883493293"
+    ],
+    "email": [
+      "gencho@abv.bg"
+    ],
+    "age": 23,
+    "nick_name": "gega",
+    "parameters": [
+      "first_name",
+      "last_name",
+      "nick_name",
+      "mobile",
+      "home",
+      "email",
+      "birthdate",
+      "age",
+      "address",
+      "note"
+    ]
+  },
+  {
+    "first_name": "Toshko",
+    "last_name": "Toshkov",
+    "mobile": [
+      "0883463293"
+    ],
+    "email": [
+      "toshi@abv.bg",
+      "toshko@gmail.com"
+    ],
+    "age": 25,
+    "parameters": [
+      "first_name",
+      "last_name",
+      "nick_name",
+      "mobile",
+      "home",
+      "email",
+      "birthdate",
+      "age",
+      "address",
+      "note"
+    ]
+  }
+]

@@ -1,0 +1,106 @@
+[
+  {
+    "first_name": "Georgi",
+    "last_name": "Ivanov",
+    "mobile": [
+      "0883463293",
+      "0879123456"
+    ],
+    "email": [
+      "ivanov@abv.bg",
+      "gonzo@gmail.com"
+    ],
+    "age": 23,
+    "nick_name": "gonzo",
+    "home": "024532190",
+    "address": "Georgi Benkovski 25",
+    "parameters": [
+      "first_name",
+      "last_name",
+      "nick_name",
+      "mobile",
+      "home",
+      "email",
+      "birthdate",
+      "age",
+      "address",
+      "note"
+    ]
+  },
+  {
+    "first_name": "Atanas",
+    "last_name": "Petkov",
+    "mobile": [
+      "0893325400"
+    ],
+    "email": [
+      "petkov@abv.bg"
+    ],
+    "age": 33,
+    "home": "024222390",
+    "address": "Todor Burmov 15",
+    "birthdate": "22.02.1981",
+    "parameters": [
+      "first_name",
+      "last_name",
+      "nick_name",
+      "mobile",
+      "home",
+      "email",
+      "birthdate",
+      "age",
+      "address",
+      "note"
+    ]
+  },
+  {
+    "first_name": "Georgi",
+    "last_name": "Ivanov",
+    "mobile": [
+      "0883425401"
+    ],
+    "email": [
+      "gosho@abv.bg"
+    ],
+    "age": 13,
+    "address": "Mladost 4 blok: 123",
+    "birthdate": "21.12.2001",
+    "parameters": [
+      "first_name",
+      "last_name",
+      "nick_name",
+      "mobile",
+      "home",
+      "email",
+      "birthdate",
+      "age",
+      "address",
+      "note"
+    ]
+  },
+  {
+    "first_name": "Atanas",
+    "last_name": "Stoqnov",
+    "mobile": [
+      "0883325400",
+      "0896382263"
+    ],
+    "email": [
+      "stoqnov@abv.bg"
+    ],
+    "age": 43,
+    "note": "Old friend from school",
+    "parameters": [
+      "first_name",
+      "last_name",
+      "nick_name",
+      "mobile",
+      "home",
+      "email",
+      "birthdate",
+      "age",
+      "address",
+      "note"
+    ]
+  }
+]

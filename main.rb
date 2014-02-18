@@ -1,4 +1,4 @@
-module CM
+module ContactMenager
 
 require "./record"
 require "./merge"
@@ -22,7 +22,7 @@ require "./save_phone_book"
         new_parameters = check_for_new_parameters kwargs
         new_parameters.length <= 3 ? add_record(record, kwargs, new_parameters) : "Maximum number of costumized parameters is 3"
       else
-        "Zapis s takiva parametri  veche s1shtestvuva"
+        "Zapis s takiva parametri veche s1shtestvuva"
       end
     end
 
@@ -118,41 +118,40 @@ require "./save_phone_book"
   end
 end
 
-a = CM::PhoneBook.new [
-        Record.new({first_name: "Georgi", last_name: "Dimitrov", mobile: ["0883463293", "11111111"], email: ["dimitrov@abv.bg", "nenenneen"], age: 23, nick_name: "gogo"},[:first_name, :last_name, :nick_name, :mobile, :home, :email, :birthdate, :age, :address, :note]),
-        Record.new({first_name: "Atanas", last_name: "Ivanov", mobile: ["0893325400"], email: ["atanas@abv.bg"], age: 33},[:first_name, :last_name, :nick_name, :mobile, :home, :email, :birthdate, :age, :address, :note]),
-        Record.new({first_name: "Georgi", last_name: "Dimitrov", mobile: ["0883425401"], email: ["gosho@abv.bg"], age: 13},[:first_name, :last_name, :nick_name, :mobile, :home, :email, :birthdate, :age, :address, :note]),
-        Record.new({first_name: "Atanas", last_name: "Stoqnov", mobile: ["0883325400", "0896382263"], email: ["stoqnov@abv.bg"], age: 43},[:first_name, :last_name, :nick_name, :mobile, :home, :email, :birthdate, :age, :address, :note])
+a = ContactMenager::PhoneBook.new [
+        Record.new({first_name: "Georgi", last_name: "Ivanov", mobile: ["0883463293", "0879123456"], email: ["ivanov@abv.bg", "gonzo@gmail.com"], age: 23, nick_name: "gonzo", home: "024532190", address: "Georgi Benkovski 25"},[:first_name, :last_name, :nick_name, :mobile, :home, :email, :birthdate, :age, :address, :note]),
+        Record.new({first_name: "Atanas", last_name: "Petkov", mobile: ["0893325400"], email: ["petkov@abv.bg"], age: 33, home: "024222390", address: "Todor Burmov 15", birthdate: "22.02.1981"},[:first_name, :last_name, :nick_name, :mobile, :home, :email, :birthdate, :age, :address, :note]),
+        Record.new({first_name: "Georgi", last_name: "Ivanov", mobile: ["0883425401"], email: ["gosho@abv.bg"], age: 13, address: "Mladost 4 blok: 123", birthdate: "21.12.2001"},[:first_name, :last_name, :nick_name, :mobile, :home, :email, :birthdate, :age, :address, :note]),
+        Record.new({first_name: "Atanas", last_name: "Stoqnov", mobile: ["0883325400", "0896382263"], email: ["stoqnov@abv.bg"], age: 43, note: "Old friend from school"},[:first_name, :last_name, :nick_name, :mobile, :home, :email, :birthdate, :age, :address, :note])
         ]
 # a.add_contact( mobile: 3456, email: "dad", note: "ahaaaa", last_name: "todor")
-a.add_contact(first_name: "pesho", mobile: 3456, email: "dad", note: "ahaaaa", last_name: "todorov", nov: "nov zapis", nov2: 2, nov3: 3)
-puts a.show
+# a.add_contact(first_name: "pesho", mobile: 3456, email: "dad", note: "ahaaaa", last_name: "todorov", nov: "nov zapis", nov2: 2, nov3: 3)
+# puts a.show
 # puts a.search "0883463293", :mobile
 # atanas = a.select(first_name: "Atanas", last_name: "Stoqnov")
 # puts a.show_selected
 # a.edit atanas, :mobile, "0883325400", :edit, new_value: "123"
-a.select(nov2: 2)
-puts a.show_selected
+# a.select(nov2: 2)
+# puts a.show_selected
 # a.delete_record
 # puts a.show
 # a.delete_record
 # a.restore
 # puts a.show a.deleted
 # puts a.show
-b = CM::PhoneBook.new [
-        Record.new({first_name: "Gencho", last_name: "Dimitrov", mobile: ["0883493293"], email: ["gencho@abv.bg"], age: 23, nick_name: "gega"},
-                   [:first_name, :last_name, :nick_name, :mobile, :home, :email, :birthdate, :age, :address, :note]),
-        Record.new({first_name: "Toshko", last_name: "Toshkov", mobile: ["0883463293"], email: ["toshi@abv.bg", "dadadada"], age: 25},
-                   [:first_name, :last_name, :nick_name, :mobile, :home, :email, :birthdate, :age, :address, :note])
-      ]
+# b = ContactMenager::PhoneBook.new [
+#         Record.new({first_name: "Gencho", last_name: "Dimitrov", mobile: ["0883493293"], email: ["gencho@abv.bg"], age: 23, nick_name: "gega"},
+#                    [:first_name, :last_name, :nick_name, :mobile, :home, :email, :birthdate, :age, :address, :note]),
+#         Record.new({first_name: "Toshko", last_name: "Toshkov", mobile: ["0883463293"], email: ["toshi@abv.bg", "toshko@gmail.com"], age: 25},
+#                    [:first_name, :last_name, :nick_name, :mobile, :home, :email, :birthdate, :age, :address, :note])
+#       ]
 # c = Merger.new.merge a, b
 # puts a.show
 # puts b.show
 # puts c.show
-my_book = Save.save_phone_book a, "phone_book"
-a = 2
-a = Save.load_phone_book my_book
-puts a.show
-a.select first_name: "pesho"
-puts a.show_selected
-a.phone_book.first.parameters
+# my_book = Save.save_phone_book a, "first_test_phone_book"
+# a = 2
+# a = Save.load_phone_book my_book
+# puts a.show
+
+# Save.save_phone_book b , "second_test_phone_book"
