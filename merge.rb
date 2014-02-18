@@ -12,23 +12,14 @@ class Merger
       if duplicate.empty?
         @merged.add_contact contact.record
       else
-        collisin_handler(duplicate.first, contact)
+        collision_handler_output(duplicate.first, contact)
       end
     end
 
     @merged
   end
 
-  def collisin_handler(duplicate, new_contact)
-    puts "#{duplicate.headline.strip} duplicates with #{new_contact.headline}"
-    puts "Select one of this options: #{@options.join(", ").to_s}\n"
-
-    option = gets.chomp.to_sym
-    until @options.include? option
-       puts "Avelabal options are #{@options.join(", ").to_s}"
-       option = gets.chomp.to_sym
-    end
-
+  def collision_handler(duplicate, new_contact, option)
     case option
       when :first
         puts "Did't add\n#{new_contact.headline}"
@@ -87,6 +78,19 @@ class Merger
         mobile: (duplicate.record[:mobile] + new_contact.record[:mobile]).uniq
       }
     end
+  end
+
+  def collision_handler_output(duplicate, new_contact)
+    puts "#{duplicate.headline.strip} duplicates with #{new_contact.headline}"
+    puts "Select one of this options: #{@options.join(", ").to_s}\n"
+
+    option = gets.chomp.to_sym
+    until @options.include? option
+       puts "Avelabal options are #{@options.join(", ").to_s}"
+       option = gets.chomp.to_sym
+    end
+
+    collision_handler(duplicate, new_contact, option)
   end
 
 end

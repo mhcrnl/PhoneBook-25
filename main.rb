@@ -139,16 +139,16 @@ a = ContactMenager::PhoneBook.new [
 # a.restore
 # puts a.show a.deleted
 # puts a.show
-# b = ContactMenager::PhoneBook.new [
-#         Record.new({first_name: "Gencho", last_name: "Dimitrov", mobile: ["0883493293"], email: ["gencho@abv.bg"], age: 23, nick_name: "gega"},
-#                    [:first_name, :last_name, :nick_name, :mobile, :home, :email, :birthdate, :age, :address, :note]),
-#         Record.new({first_name: "Toshko", last_name: "Toshkov", mobile: ["0883463293"], email: ["toshi@abv.bg", "toshko@gmail.com"], age: 25},
-#                    [:first_name, :last_name, :nick_name, :mobile, :home, :email, :birthdate, :age, :address, :note])
-#       ]
-# c = Merger.new.merge a, b
+b = ContactMenager::PhoneBook.new [
+        Record.new({first_name: "Gencho", last_name: "Dimitrov", mobile: ["0883493293"], email: ["gencho@abv.bg"], age: 23, nick_name: "gega"},
+                   [:first_name, :last_name, :nick_name, :mobile, :home, :email, :birthdate, :age, :address, :note]),
+        Record.new({first_name: "Toshko", last_name: "Toshkov", mobile: ["0883463293"], email: ["toshi@abv.bg", "toshko@gmail.com"], age: 25},
+                   [:first_name, :last_name, :nick_name, :mobile, :home, :email, :birthdate, :age, :address, :note])
+      ]
+c = Merger.new.merge a, b
 # puts a.show
 # puts b.show
-# puts c.show
+puts c.show
 # my_book = Save.save_phone_book a, "first_test_phone_book"
 # a = 2
 # a = Save.load_phone_book my_book
