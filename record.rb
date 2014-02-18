@@ -13,7 +13,14 @@ class Record
     elsif value == nil and key == :first_name
       "#{key.to_s} is required field"
     else
-      @record[key] = value
+      if !@parameters.include? key and @parameters.length < 13
+        @record[key] = value
+        @parameters << key
+      elsif @parameters.include? key
+        value != nil ? @record[key] = value : @record.delete(key)
+      else
+        "You can't customize more than 3 new parameters per contact"
+      end
     end
   end
 
@@ -38,7 +45,7 @@ class Record
   def flag_hendler(key, value, flag, new_value)
     case flag
       when :insert
-        @record[key] << value
+        @record[key] = (@record[key] << value).uniq.flatten
       when :delete
         @record[key].length > 1 ?  @record[key].delete(value) : "#{key.to_s} is required field"
       when :edit

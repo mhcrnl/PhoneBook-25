@@ -15,4 +15,164 @@ describe ContactMenager do
     first_test_book.phone_book.last.record[:note].should eq "Test adding contact"
   end
 
+  it "Add new contact with customized parameter" do
+    first_test_book.add_contact(
+                                first_name: "Pesho",
+                                mobile: "0897998877",
+                                email: "todorov@gmail.com",
+                                customized: "This is something uniq for me"
+                                ).should eq "Contact added succsessfuly"
+
+    first_test_book.phone_book.last.record[:customized].should eq "This is something uniq for me"
+    first_test_book.phone_book.last.parameters.should include :customized
+  end
+
+  it "Doesn't add new contact with more than 3 customized parameters" do
+    first_test_book.add_contact(
+                                first_name: "Pesho",
+                                mobile: "0897998877",
+                                email: "todorov@gmail.com",
+                                customized: "This is something uniq for me",
+                                customized_again: 2,
+                                fax: "02342553",
+                                too_much: "Can't handle it"
+                                ).should eq "Maximum number of customized parameters is 3"
+
+    first_test_book.phone_book.last.parameters.should_not include :fax
+  end
+
+  it "Doesn't add new contact with required records that already exists" do
+    length = first_test_book.phone_book.length
+    first_test_book.add_contact(
+                                first_name: "Pesho",
+                                mobile: "0883463293",
+                                email: "todorov@gmail.com"
+                                ).should eq "Record with such parameters already exists"
+
+    first_test_book.phone_book.length.should eq length
+  end
+
+  it "Edit unspecial record" do
+    first_test_book.select first_name: "Atanas", last_name: "Stoqnov"
+    first_test_book.edit :last_name, "Krasimirov"
+    first_test_book.diselect
+
+    first_test_book.selected.should eq nil
+
+    first_test_book.select(last_name: "Krasimirov")
+    first_test_book.selected.record[:last_name].should eq "Krasimirov"
+    first_test_book.selected.record[:note].should eq "Old friend from school"
+  end
+
+  it "Doesn't remove first name" do
+    first_test_book.select first_name: "Atanas", last_name: "Stoqnov"
+    first_test_book.edit(:first_name, nil).should eq "first_name is required field"
+    first_test_book.selected.record[:first_name].should eq "Atanas"
+  end
+
+  it "Remove last name" do
+    first_test_book.select first_name: "Atanas", last_name: "Stoqnov"
+    first_test_book.edit :last_name, nil
+    first_test_book.selected.record[:last_name].should eq nil
+  end
+
+  it "Add custom parameter" do
+    first_test_book.select first_name: "Atanas", last_name: "Stoqnov"
+    first_test_book.edit :customized, "This is something uniq for me"
+    first_test_book.selected.record[:customized].should eq "This is something uniq for me"
+    first_test_book.phone_book.last.parameters.should include :customized
+  end
+
+  it "Doesn't add more than 3 custom parameters" do
+    first_test_book.select first_name: "Atanas", last_name: "Stoqnov"
+    first_test_book.edit :customized, "This is something uniq for me"
+    first_test_book.edit :customized_again, 2
+    first_test_book.edit :fax, "02342553"
+    first_test_book.edit(
+                         :too_much,
+                         "Can't handle it"
+                         ).should eq "You can't customize more than 3 new parameters per contact"
+
+    first_test_book.selected.record[:too_much].should eq nil
+    first_test_book.phone_book.last.parameters.should_not include :too_much
+  end
+
+  it "Edit required field - insert one mobile number" do
+    first_test_book.select first_name: "Atanas", last_name: "Stoqnov"
+    first_test_book.edit :mobile, "0883112233"
+    first_test_book.selected.record[:mobile].should =~ [
+                                                        "0883325400",
+                                                        "0896382263",
+                                                        "0883112233"
+                                                        ]
+  end
+
+  it "Edit required field - insert two mobile numbers" do
+    first_test_book.select first_name: "Atanas", last_name: "Stoqnov"
+    first_test_book.edit :mobile, ["0883112233", "0883445566"]
+    first_test_book.selected.record[:mobile].should =~ [
+                                                        "0883445566",
+                                                        "0883325400",
+                                                        "0896382263",
+                                                        "0883112233"
+                                                       ]
+  end
+
+  it "Edit required field - insert duplicate mobile number" do
+    first_test_book.select first_name: "Atanas", last_name: "Stoqnov"
+    first_test_book.edit :mobile, "0883325400"
+    first_test_book.selected.record[:mobile].should =~ [
+                                                        "0883325400",
+                                                        "0896382263",
+                                                        ]
+  end
+
+  it "Edit required field - insert mobile number that duplicates in other contact" do
+    first_test_book.select first_name: "Atanas", last_name: "Stoqnov"
+    first_test_book.edit(:mobile, "0883425401").should eq "Value duplicates in other contact"
+    first_test_book.selected.record[:mobile].should =~ [
+                                                        "0883325400",
+                                                        "0896382263",
+                                                        ]
+  end
+
+  it "Edit required field - edit mobile number" do
+    first_test_book.select first_name: "Atanas", last_name: "Stoqnov"
+    first_test_book.edit :mobile, "0883325400", :edit, new_value: "0897111111"
+    first_test_book.selected.record[:mobile].should == [
+                                                        "0897111111",
+                                                        "0896382263",
+                                                        ]
+  end
+
+  it "Edit required field - edit mobile number with one that duplicates in other contact" do
+    first_test_book.select first_name: "Atanas", last_name: "Stoqnov"
+    first_test_book.edit(
+                         :mobile,
+                         "0883325400",
+                         :edit,
+                         new_value: "0883425401"
+                         ).should eq "Value duplicates in other contact"
+
+    first_test_book.selected.record[:mobile].should == [
+                                                        "0883325400",
+                                                        "0896382263",
+                                                        ]
+  end
+
+  it "Select record" do
+    first_test_book.select nick_name: "gonzo"
+    first_test_book.selected.record[:first_name].should eq "Georgi"
+    first_test_book.selected.record[:last_name].should eq "Ivanov"
+  end
+
+  it "Doesn't select multiple records" do
+    first_test_book.select(first_name: "Georgi").should eq "You need to be more specific"
+    first_test_book.selected.should eq nil
+  end
+
+  it "Does't select nonexistent record" do
+    first_test_book.select(nonexistent: "Georgi").should eq "There is no record with that parameters"
+    first_test_book.selected.should eq nil
+  end
 end

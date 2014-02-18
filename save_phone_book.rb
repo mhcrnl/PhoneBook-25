@@ -21,7 +21,7 @@ class Save
       new_hash = {}
       json_hash.each { |key, value| new_hash[key.to_sym] = value }
       parameters = new_hash[:parameters].map { |value| value.to_sym }
-      new_hash[:parameters] = nil
+      new_hash.delete :parameters
       Record.new new_hash, parameters
     end
     ContactMenager::PhoneBook.new loaded
