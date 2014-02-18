@@ -6,7 +6,7 @@ class MergeControler
   end
 
   def merge(first, second)
-    @merged = ::ContactMenager::PhoneBook.new
+    @merged = PhoneBook.new
     first.phone_book.each { |contact| @merged.add_contact contact.record }
 
     second.phone_book.each do |contact|

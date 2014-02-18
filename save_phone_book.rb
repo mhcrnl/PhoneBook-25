@@ -24,6 +24,6 @@ class Save
       new_hash.delete :parameters
       Record.new new_hash, parameters
     end
-    ContactMenager::PhoneBook.new loaded
+    PhoneBook.new loaded
   end
 end

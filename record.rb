@@ -48,9 +48,11 @@ class Record
         @record[key] = (@record[key] << value).uniq.flatten
       when :delete
         @record[key].length > 1 ?  @record[key].delete(value) : "#{key.to_s} is required field"
-      when :edit
+      when :replace
         if @record[key].include? value
           @record[key].insert(@record[key].index(value), new_value).delete value
+          @record[key] = @record[key].flatten
+          "Value replaced successfully"
         else
           "The value #{value} is not in the record: #{headline.strip}"
         end
