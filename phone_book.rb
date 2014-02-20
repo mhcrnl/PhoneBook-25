@@ -1,13 +1,13 @@
 class PhoneBook
 
-  attr_reader :selected, :deleted, :phone_book
+  attr_reader :selected, :deleted, :phone_book, :parameters
 
   def initialize(phone_book = [])
     @phone_book = phone_book
     @selected = nil
     @parameters = %i(first_name last_name nick_name mobile home email birthdate age address note)
     @deleted = []
-    @MAXCOSTOMPARAMETER = 3
+    @MAX_CUSTOM_PARAMETER = 3
   end
 
   def add_contact(first_name:, mobile:, email:, **kwargs)
@@ -15,10 +15,10 @@ class PhoneBook
       record = {first_name: first_name, mobile: [mobile].flatten, email: [email].flatten}
       new_parameters = check_for_new_parameters kwargs
 
-      if new_parameters.length <= @MAXCOSTOMPARAMETER
+      if new_parameters.length <= @MAX_CUSTOM_PARAMETER
         add_record(record, kwargs, new_parameters)
       else
-        "Maximum number of customized parameters is #{@MAXCOSTOMPARAMETER}"
+        "Maximum number of customized parameters is #{@MAX_CUSTOM_PARAMETER}"
       end
 
     else
@@ -120,7 +120,11 @@ class PhoneBook
 
   def add_record(record, kwargs, new_parameters)
     kwargs.each { |key, value| record[key] = value } # record.merge kwargs this does not work!?!
-    parameters = @parameters << new_parameters
+    if new_parameters.empty?
+      parameters = @parameters
+    else
+      parameters = @parameters << new_parameters
+    end
     @phone_book << Record.new(record, parameters.flatten)
     "Contact added succsessfuly"
   end
