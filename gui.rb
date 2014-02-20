@@ -28,7 +28,7 @@ require "green_shoes"
           @app.alert "Phone book #{@e.text} is already loaded"
         else
           @name = @e.text
-          @menagers[@name] = Save.load_phone_book @name
+          @menagers[@e.text] = Save.load_phone_book @e.text
           if @menagers[@name].is_a? String
             @app.alert @menagers[@name]
             @menagers.delete @name
@@ -36,7 +36,9 @@ require "green_shoes"
           else
             @current_phone_book = @menagers[@name]
             @app.append do
-              add_book(@current_phone_book)
+              @contact_list = @app.stack do
+              add_book(@current_phone_book, @name)
+              end
             end
             @e.text = ""
           end
@@ -46,21 +48,20 @@ require "green_shoes"
     end
   end
 
-  def add_book(phone_book)
-    @contact_list = @app.stack
-
+  def add_book(phone_book, name)
+    contact_list = @app.stack
     @adding_button = @app.button "Add new record" do
-      @contact_list.prepend do
+      contact_list.prepend do
         @adding_field = @app.stack
         @adding_field.append do
-          add_new_record
+          add_new_record phone_book, contact_list, name
         end
       end
     end
 
-    @app.para "Phone book #{@name}:"
+    @app.para "Phone book #{name}:"
     phone_book.phone_book.each do |contact|
-      @contact_list.append do
+      contact_list.append do
         @app.button(
                     contact.headline,
                     :width => 400,
@@ -73,20 +74,21 @@ require "green_shoes"
       end
     end
 
-    @contact_list.append do
+    contact_list.append do
       @app.flow do
 
-        @app.button "Save phone_book" do
-          Save.save_phone_book @current_phone_book, @name
+        @app.button "Save phone book" do
+          Save.save_phone_book phone_book, name
         end
 
-        @app.button "Clear" do
-          @contact_list.clear do add_book(phone_book) end
+        @app.button "Update" do
+          contact_list.clear do add_book(phone_book, name) end
         end
 
         @app.button "Clear All" do
-          @contact_list.clear do
-            @menagers.delete @name
+          @app.clear do
+            navigation_bar
+            @menagers = {}
             @current_phone_book = nil
             @name = nil
           end
@@ -97,10 +99,10 @@ require "green_shoes"
 
   end
 
-  def add_new_record
+  def add_new_record(phone_book, contact_list, name)
     @new_contact_records = {}
 
-    @current_phone_book.parameters.each do |parameter|
+    phone_book.parameters.each do |parameter|
       @app.para parameter.to_s
       value = @app.edit_line do
         @new_contact_records[parameter] = value.text == "" ? nil : value.text
@@ -132,10 +134,10 @@ require "green_shoes"
       if @new_contact_records[:first_name] == nil or @new_contact_records[:mobile] == nil or @new_contact_records[:email] == nil
         @app.alert "first_name, mobile and email are required fields"
       else
-        message = @current_phone_book.add_contact @new_contact_records
+        message = phone_book.add_contact @new_contact_records
         if message == "Contact added succsessfuly"
           @app.alert message
-          @contact_list.clear do add_book(@current_phone_book) end
+          contact_list.clear do add_book(phone_book, name) end
         else
           @app.alert message
         end
