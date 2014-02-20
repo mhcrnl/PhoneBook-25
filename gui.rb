@@ -27,10 +27,18 @@ require "green_shoes"
         elsif @menagers[@e.text] != nil
           @app.alert "Phone book #{@e.text} is already loaded"
         else
-          @menagers[@e.text] = Save.load_phone_book @e.text
-          @current_phone_book = @menagers[@e.text]
-          @app.append do
-            add_book(@current_phone_book)
+          @name = @e.text
+          @menagers[@name] = Save.load_phone_book @name
+          if @menagers[@name].is_a? String
+            @app.alert @menagers[@name]
+            @menagers.delete @name
+            @name = nil
+          else
+            @current_phone_book = @menagers[@name]
+            @app.append do
+              add_book(@current_phone_book)
+            end
+            @e.text = ""
           end
         end
 
@@ -50,7 +58,7 @@ require "green_shoes"
       end
     end
 
-    @app.para "Phone book #{@e.text}:"
+    @app.para "Phone book #{@name}:"
     phone_book.phone_book.each do |contact|
       @contact_list.append do
         @app.button(
@@ -66,8 +74,24 @@ require "green_shoes"
     end
 
     @contact_list.append do
-      @app.button "Clear" do
-        @contact_list.clear do add_book(phone_book) end
+      @app.flow do
+
+        @app.button "Save phone_book" do
+          Save.save_phone_book @current_phone_book, @name
+        end
+
+        @app.button "Clear" do
+          @contact_list.clear do add_book(phone_book) end
+        end
+
+        @app.button "Clear All" do
+          @contact_list.clear do
+            @menagers.delete @name
+            @current_phone_book = nil
+            @name = nil
+          end
+        end
+
       end
     end
 

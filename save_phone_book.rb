@@ -17,13 +17,17 @@ class Save
   end
 
   def self.load_phone_book(file_name)
-    loaded = JSON.parse(IO.read "#{file_name}.json").map do |json_hash|
-      new_hash = {}
-      json_hash.each { |key, value| new_hash[key.to_sym] = value }
-      parameters = new_hash[:parameters].map { |value| value.to_sym }
-      new_hash.delete :parameters
-      Record.new new_hash, parameters
+    if File.exist? "#{file_name}.json"
+      loaded = JSON.parse(IO.read "#{file_name}.json").map do |json_hash|
+        new_hash = {}
+        json_hash.each { |key, value| new_hash[key.to_sym] = value }
+        parameters = new_hash[:parameters].map { |value| value.to_sym }
+        new_hash.delete :parameters
+        Record.new new_hash, parameters
+      end
+      PhoneBook.new loaded
+    else
+      "No such file: #{file_name}"
     end
-    PhoneBook.new loaded
   end
 end
