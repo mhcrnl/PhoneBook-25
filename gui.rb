@@ -13,58 +13,61 @@ module GUI
     end
 
     def navigation_bar
-      @nav = @app.flow do
-
-        @app.button "Create" do
-          if @e.text == ""
-            @app.alert "Enter name for phone book please"
-          elsif @menagers[@e.text] != nil
-            @app.alert "Phone book #{@e.text} is already loaded"
-          else
-            @name = @e.text
-            @menagers[@e.text] = PhoneBook.new
-            @current_phone_book = @menagers[@name]
-              @app.append do
-                @contact_list = @app.stack do
-                add_book(@current_phone_book, @name)
-                end
-              end
-            @e.text = ""
-          end
-        end
-
-        @e = @app.edit_line :width => 350, :height => 25
-
-        @app.button "Load" do
-
-          if @e.text == ""
-            @app.alert "Enter name for phone book please"
-          elsif @menagers[@e.text] != nil
-            @app.alert "Phone book #{@e.text} is already loaded"
-          else
-            @name = @e.text
-            @menagers[@e.text] = Save.load_phone_book @e.text
-            if @menagers[@name].is_a? String
-              @app.alert @menagers[@name]
-              @menagers.delete @name
-              @name = nil
+      @nav = @app.stack margin: 4 do
+        @app.flow do
+          @app.button "Create" do
+            if @e.text == ""
+              @app.alert "Enter name for phone book please"
+            elsif @menagers[@e.text] != nil
+              @app.alert "Phone book #{@e.text} is already loaded"
             else
+              @name = @e.text
+              @menagers[@e.text] = PhoneBook.new
               @current_phone_book = @menagers[@name]
-              @app.append do
-                @contact_list = @app.stack do
-                add_book(@current_phone_book, @name)
+                @app.append do
+                  @contact_list = @app.stack do
+                  add_book(@current_phone_book, @name)
+                  end
                 end
-              end
               @e.text = ""
             end
           end
 
+          @e = @app.edit_line :width => 450, :height => 25
+
+          @app.button "Load" do
+
+            if @e.text == ""
+              @app.alert "Enter name for phone book please"
+            elsif @menagers[@e.text] != nil
+              @app.alert "Phone book #{@e.text} is already loaded"
+            else
+              @name = @e.text
+              @menagers[@e.text] = Save.load_phone_book @e.text
+              if @menagers[@name].is_a? String
+                @app.alert @menagers[@name]
+                @menagers.delete @name
+                @name = nil
+              else
+                @current_phone_book = @menagers[@name]
+                @app.append do
+                  @contact_list = @app.stack do
+                  add_book(@current_phone_book, @name)
+                  end
+                end
+                @e.text = ""
+              end
+            end
+
+          end
         end
-      end
-        @nav.append do
-          merge_to = @app.edit_line
-          @app.inscription "with"
-          merge_with = @app.edit_line
+      # end
+        @app.flow do
+        # @nav.append do
+          @app.para "Merge", width: 50, align: 'center'
+          merge_to = @app.edit_line :height => 25
+          @app.para "with", width: 40, align: 'center'
+          merge_with = @app.edit_line :height => 25
           @app.button "Merge" do
             if @menagers[merge_to.text] == nil or @menagers[merge_with.text] == nil
               @app.alert "You must load phone books"
@@ -76,6 +79,8 @@ module GUI
                                )
             end
           end
+        # end
+        end
       end
     end
 
@@ -83,7 +88,7 @@ module GUI
       contact_list = @app.stack
       @adding_button = @app.button "Add new record" do
         contact_list.prepend do
-          @adding_field = @app.stack
+          @adding_field = @app.stack margin: 4
           @adding_field.append do
             add_new_record phone_book, contact_list, name
           end
@@ -129,15 +134,17 @@ module GUI
       @new_contact_records = {}
 
       phone_book.parameters.each do |parameter|
-        @app.para parameter.to_s
-        value = @app.edit_line do
-          @new_contact_records[parameter] = value.text == "" ? nil : value.text
+        @app.flow do
+          @app.para parameter.to_s, width: 80
+          value = @app.edit_line do
+            @new_contact_records[parameter] = value.text == "" ? nil : value.text
+          end
         end
       end
 
       @MAX_CUSTOM_PARAMETER.times do
         @app.flow do
-          @app.para "Custom record:"
+          @app.para "Custom record:", width: 110, align: 'right'
           param_value = ""
           old_param_value = ""
           param = @app.edit_line do
@@ -153,20 +160,22 @@ module GUI
         end
 
       end
-      @app.button "Preview" do
-        @app.alert @new_contact_records.inspect
-      end
-      @app.button "Add to phone book" do
-        required = [@new_contact_records[:first_name], @new_contact_records[:mobile], @new_contact_records[:email]]
-        if !required.all?
-          @app.alert "first_name, mobile and email are required fields"
-        else
-          message = phone_book.add_contact @new_contact_records
-          if message == "Contact added succsessfuly"
-            @app.alert message
-            contact_list.clear do add_book(phone_book, name) end
+      @app.flow do
+        @app.button "Preview" do
+          @app.alert @new_contact_records.inspect
+        end
+        @app.button "Add to phone book" do
+          required = [@new_contact_records[:first_name], @new_contact_records[:mobile], @new_contact_records[:email]]
+          if !required.all?
+            @app.alert "first_name, mobile and email are required fields"
           else
-            @app.alert message
+            message = phone_book.add_contact @new_contact_records
+            if message == "Contact added succsessfuly"
+              @app.alert message
+              contact_list.clear do add_book(phone_book, name) end
+            else
+              @app.alert message
+            end
           end
         end
       end
@@ -212,7 +221,7 @@ module GUI
       @phone_book.select mobile: @contact.record[:mobile].first
       @selected = @phone_book.selected
 
-      @info = @app.stack
+      @info = @app.stack margin: 4
       @info.append do
         load_records
       end
@@ -220,11 +229,11 @@ module GUI
 
     def load_records
       @contact.parameters.each do |parameter|
-        param_record = @app.flow
-        @info.append do
-          param_record.append do
+        param_record = @app.flow do
+        # @info.append do
+          # param_record.append do
           if [:email, :mobile].include? parameter
-            @app.para parameter
+            @app.para parameter, width: 80, align: 'right'
             @selected.record[parameter].each do |record_value|
               value = @app.edit_line record_value
               old_value = value.text
@@ -251,7 +260,7 @@ module GUI
 
             end
           else
-            @app.para parameter
+            @app.para parameter, width: 80, align: 'right'
             value = @app.edit_line "#{@selected.record[parameter].to_s}"
             old_value = value.text
             @app.button "Edit" do
@@ -263,7 +272,7 @@ module GUI
             end
           end
         end
-        end
+        # end
       end #contact.parameters.each
 
       (@MAX_PARAMETERS - @selected.parameters.length).times do
@@ -284,10 +293,21 @@ module GUI
           end
         end
       end
+      @info.append do
+        @app.flow do
 
-      @app.button "close" do
-        @contact_list.clear
-        @app.close
+          @app.button "Close" do
+            @contact_list.clear
+            @app.close
+          end
+
+          @app.button "Delete" do
+            @phone_book.delete_record
+            @contact_list.clear
+            @app.close
+          end
+
+        end
       end
     end
   end
