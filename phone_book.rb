@@ -4,6 +4,7 @@ class PhoneBook
 
   def initialize(phone_book = [])
     @phone_book = phone_book
+    @required = %i(mobile email)
     @selected = nil
     @parameters = %i(first_name last_name nick_name mobile home email birthdate age address note)
     @deleted = []
@@ -39,7 +40,7 @@ class PhoneBook
   end
 
   def search(value, key = :first_name)
-    list = @phone_book.select { |contact| [:email, :mobile].include?(key) ? contact.record[key].include?(value) : (contact.record[key] == value) }
+    list = @phone_book.select { |contact| @required.include?(key) ? contact.record[key].include?(value) : (contact.record[key] == value) }
     if list.empty?
       "There is no record for contact with #{key.to_s}: #{value}"
     elsif list.length == 1
@@ -60,7 +61,7 @@ class PhoneBook
   def select(**kwargs)
     contact = @phone_book.select do|contact|
       kwargs.keys.all? do |key|
-        if key == :mobile or key == :email
+        if @required.include? key
           contact.record[key].include? kwargs[key]
         else
           contact.record[key] == kwargs[key]

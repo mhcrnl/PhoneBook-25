@@ -1,3 +1,51 @@
+require 'stringio'
+
+describe Save do
+  it "Loads phone book from json file" do
+    loaded = Save.load_phone_book File.join(File.dirname(__FILE__), "first_test_phone_book")
+    loaded.phone_book.length.should eq 4
+    loaded.select nick_name: "gonzo"
+    loaded.selected.record[:nick_name].should eq "gonzo"
+  end
+
+  it "Doesn't load unexisting file" do
+    loaded = Save.load_phone_book File.join(File.dirname(__FILE__), "unexisting")
+    loaded.should eq "No such file: #{File.join(File.dirname(__FILE__), "unexisting")}"
+  end
+
+  it "Saves phone book to file" do
+    parameters = %i(first_name last_name nick_name mobile home email birthdate age address note)
+    phone_book = PhoneBook.new [
+                               Record.new(
+                                          {
+                                           first_name: "Gencho",
+                                           last_name: "Dimitrov",
+                                           mobile: ["0883493293"],
+                                           email: ["gencho@abv.bg"],
+                                           age: 23,
+                                           nick_name: "gega"
+                                          },
+                                          parameters
+                                          ),
+                               Record.new(
+                                          {
+                                           first_name: "Toshko",
+                                           last_name: "Toshkov",
+                                           mobile: ["0883463293"],
+                                           email: ["toshi@abv.bg", "toshko@gmail.com"],
+                                           age: 25
+                                           },
+                                          parameters
+                                          )
+                              ]
+    Save.save_phone_book phone_book, File.join(File.dirname(__FILE__), "second_test_phone_book")
+    loaded = Save.load_phone_book File.join(File.dirname(__FILE__), "second_test_phone_book")
+    loaded.phone_book.length.should eq 2
+    loaded.select nick_name: "gega"
+    loaded.selected.record[:first_name].should eq "Gencho"
+  end
+end
+
 describe ContactMenager do
   let(:first_test_book) { Save.load_phone_book File.join(File.dirname(__FILE__), "first_test_phone_book") }
 
@@ -182,7 +230,8 @@ describe ContactMenager do
                          :mobile,
                          "0883111111",
                          :replace, new_value: "0897222222"
-                         ).should eq "The value 0883111111 is not in the record: #{first_test_book.selected.headline.strip}"
+    ).should eq "The value 0883111111 is not in the record: #{first_test_book.selected.headline.strip}"
+
     first_test_book.selected.record[:mobile].should == [
                                                         "0883325400",
                                                         "0896382263",
@@ -204,7 +253,12 @@ describe ContactMenager do
 
   it "Edit required field - wrong flag" do
     first_test_book.select first_name: "Atanas", last_name: "Stoqnov"
-    first_test_book.edit(:mobile, "0896382263", :wrong_flag).should eq "There is no such flag wrong_flag"
+    first_test_book.edit(
+                         :mobile,
+                         "0896382263",
+                         :wrong_flag
+                         ).should eq "There is no such flag wrong_flag"
+
     first_test_book.selected.record[:mobile].should == ["0883325400", "0896382263"]
   end
 
@@ -245,4 +299,101 @@ describe ContactMenager do
   it "Doesn't delete unselected record" do
     first_test_book.delete_record.should eq "No selected contact"
   end
+
+end
+
+describe MergeControler do
+  let(:second_test_book) { Save.load_phone_book File.join(File.dirname(__FILE__), "second_test_phone_book") }
+
+  let(:console_merger) { MergeControler.new console: true }
+
+  it "Merge books with no duplicates" do
+    test_phone_book = PhoneBook.new
+    test_phone_book.add_contact(
+                                first_name: "Test",
+                                mobile: "088111111",
+                                email: "test@gmail.com"
+                                )
+    merged_phone_book = console_merger.merge test_phone_book, second_test_book
+    merged_phone_book.phone_book.length.should eq 3
+    merged_phone_book.select first_name: "Test"
+    merged_phone_book.selected.record[:first_name].should eq "Test"
+  end
+
+  it "Merge books with duplicate email select first" do
+    console_merger = MergeControler.new console: true
+    console_merger.stub!(:gets) { "first\n" }
+    second_test_book = Save.load_phone_book File.join(File.dirname(__FILE__), "second_test_phone_book")
+    test_phone_book = PhoneBook.new
+    test_phone_book.add_contact(
+                                first_name: "Duplicated",
+                                mobile: "088111111",
+                                email: "toshi@abv.bg"
+                                )
+    merged_phone_book = console_merger.merge test_phone_book, second_test_book
+    merged_phone_book.phone_book.length.should eq 2
+
+    merged_phone_book.select first_name: "Duplicated"
+    merged_phone_book.selected.record[:first_name].should eq "Duplicated"
+  end
+
+  it "Merge books with duplicate email select second" do
+    console_merger = MergeControler.new console: true
+    console_merger.stub!(:gets) { "second\n" }
+    second_test_book = Save.load_phone_book File.join(File.dirname(__FILE__), "second_test_phone_book")
+    test_phone_book = PhoneBook.new
+    test_phone_book.add_contact(
+                                first_name: "Duplicated",
+                                mobile: "0881111111",
+                                email: "toshi@abv.bg"
+                                )
+    merged_phone_book = console_merger.merge test_phone_book, second_test_book
+    merged_phone_book.phone_book.length.should eq 2
+
+    merged_phone_book.select first_name: "Toshko"
+    merged_phone_book.selected.record[:first_name].should eq "Toshko"
+  end
+
+  it "Merge books with duplicate email select merge then first_name" do
+    console_merger = MergeControler.new console: true
+    a = ["merge\n", "first_name\n"].map
+    console_merger.stub!(:gets) { a.next }
+    second_test_book = Save.load_phone_book File.join(File.dirname(__FILE__), "second_test_phone_book")
+    test_phone_book = PhoneBook.new
+    test_phone_book.add_contact(
+                                first_name: "Duplicated",
+                                mobile: "0881111111",
+                                email: "toshi@abv.bg"
+                                )
+    merged_phone_book = console_merger.merge test_phone_book, second_test_book
+    merged_phone_book.phone_book.length.should eq 2
+
+    merged_phone_book.select first_name: "Toshko"
+    merged_phone_book.selected.record[:first_name].should eq "Toshko"
+    merged_phone_book.selected.record[:mobile].should == ["0881111111", "0883463293"]
+    merged_phone_book.selected.record[:email].should == ["toshi@abv.bg", "toshko@gmail.com"]
+  end
+
+  it "Merge books with duplicate email select merge then mobile" do
+    console_merger = MergeControler.new console: true
+    a = ["merge\n", "mobile\n"].map
+    console_merger.stub!(:gets) { a.next }
+    second_test_book = Save.load_phone_book File.join(File.dirname(__FILE__), "second_test_phone_book")
+    test_phone_book = PhoneBook.new
+    test_phone_book.add_contact(
+                                first_name: "Duplicated",
+                                mobile: "0881111111",
+                                email: "toshi@abv.bg",
+                                new_pparameter: "test_parameter"
+                                )
+    merged_phone_book = console_merger.merge test_phone_book, second_test_book
+    merged_phone_book.phone_book.length.should eq 2
+
+    merged_phone_book.select first_name: "Duplicated"
+    merged_phone_book.selected.record[:first_name].should eq "Duplicated"
+    merged_phone_book.selected.record[:mobile].should == ["0883463293"]
+    merged_phone_book.selected.record[:email].should == ["toshi@abv.bg", "toshko@gmail.com"]
+    merged_phone_book.selected.record[:new_pparameter].should eq "test_parameter"
+  end
+
 end

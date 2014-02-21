@@ -5,6 +5,7 @@ class Record
   def initialize(record, parameters)
     @record = record
     @parameters = parameters
+    @MAX_PARAMETERS = 13
   end
 
   def edit_record(key, value, flag, new_value)
@@ -13,7 +14,7 @@ class Record
     elsif value == nil and key == :first_name
       "#{key.to_s} is required field"
     else
-      if !@parameters.include? key and @parameters.length < 13
+      if !@parameters.include? key and @parameters.length < @MAX_PARAMETERS
         @record[key] = value
         @parameters << key
       elsif @parameters.include? key
@@ -47,7 +48,7 @@ class Record
       when :insert
         @record[key] = (@record[key] << value).uniq.flatten
       when :delete
-        @record[key].length > 1 ?  "#{@record[key].delete(value)} deleted" : "#{key.to_s} is required field"
+        @record[key].length > 1 ? "#{@record[key].delete(value)} deleted" : "#{key.to_s} is required field"
       when :replace
         if @record[key].include? value and !@record[key].include? new_value
           @record[key].insert(@record[key].index(value), new_value).delete value

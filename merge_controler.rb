@@ -1,8 +1,8 @@
 class MergeControler
-  # require "green_shoes"
   def initialize(console: false, gui: false)
     @options = %i(first second merge)
     @console = console
+    @required = %i(mobile email)
     @gui = gui
   end
 
@@ -116,7 +116,7 @@ class MergeControler
     join_record = required_record_joiner(duplicate, new_contact, changes)
 
     changes.each { |key| join_record[key] = new_contact.record[key] }
-    (duplicate.record.keys - changes - [:email, :mobile]).each { |key| join_record[key] = duplicate.record[key] }
+    (duplicate.record.keys - changes - @required).each { |key| join_record[key] = duplicate.record[key] }
 
     @merged.add_contact join_record
     return "The new record is:\n#{@merged.phone_book.last.show}"
@@ -131,7 +131,7 @@ class MergeControler
         }
       else
         choosen = (changes & [:email]).empty? ? :mobile : :email
-        unchoosen = ([:email, :mobile] - [choosen]).first
+        unchoosen = (@required - [choosen]).first
         {
           unchoosen => (duplicate.record[unchoosen] + new_contact.record[unchoosen]).uniq,
           choosen => new_contact.record[choosen]
