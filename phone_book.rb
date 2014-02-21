@@ -123,7 +123,8 @@ class PhoneBook
     if new_parameters.empty?
       parameters = @parameters
     else
-      parameters = @parameters << new_parameters
+      parameters = @parameters.map { |parameter| parameter}
+      parameters << new_parameters
     end
     @phone_book << Record.new(record, parameters.flatten)
     "Contact added succsessfuly"

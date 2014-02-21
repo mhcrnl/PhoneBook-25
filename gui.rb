@@ -60,6 +60,19 @@ require "green_shoes"
 
       end
     end
+      @nav.append do
+        merge_to = @app.edit_line
+        @app.inscription "with"
+        merge_with = @app.edit_line
+        @app.button "Merge" do
+          if @menagers[merge_to.text] == nil or @menagers[merge_with.text] == nil
+            @app.alert "You must load phone books"
+          else
+            merge_phone_book(@menagers[merge_to.text], @menagers[merge_with.text], merge_to.text, merge_with.text)
+          end
+        end
+    end
+    # end
   end
 
   def add_book(phone_book, name)
@@ -154,6 +167,25 @@ require "green_shoes"
           contact_list.clear do add_book(phone_book, name) end
         else
           @app.alert message
+        end
+      end
+    end
+  end
+
+  def merge_phone_book(first, second, first_name, second_name)
+    merger = MergeControler.new gui: true
+    merged = merger.merge(first, second)
+    @menagers[first_name] = merged
+    p merged
+    @app.clear do
+      @menagers = {}
+      @menagers[first_name] = merged
+      @current_phone_book = merged
+      @name = first_name
+      navigation_bar
+      @nav.append do
+        @contact_list = @app.stack do
+          add_book(@current_phone_book, @name)
         end
       end
     end

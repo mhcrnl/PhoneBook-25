@@ -1,4 +1,5 @@
 class MergeControler
+  # require "green_shoes"
   def initialize(console: false, gui: false)
     @options = %i(first second merge)
     @console = console
@@ -17,7 +18,7 @@ class MergeControler
         if @console
           console_hendler(duplicate.first, contact)
         elsif @gui
-          gui_handler(duplicate.first, new_contact)
+          gui_hendler(duplicate.first, contact)
         else
           return "Choose controler"
         end
@@ -38,10 +39,35 @@ class MergeControler
   end
 
   def gui_hendler(duplicate, contact)
-    user_option = gets
+    user_option = nil
+    options = @options
+    Shoes.app do
+      message = "#{duplicate.headline.strip}\nduplicates with #{contact.headline}"
+      question = "Select one of this options: #{options.join(", ").to_s}"
+      option = ask("#{message}\n#{question}")
+      user_option = option == nil ? :first : option.to_sym
+      until options.include? user_option
+        alert "Avelabal options are #{options.join(", ").to_s}"
+        option = ask("#{message}\n#{question}")
+        user_option = option == nil ? :first : option.to_sym
+      end
+      # close
+    end
+      p user_option
     if user_option == :merge
-      user_changes = gets
-      puts extract_records(duplicate, contact, changes)
+      user_changes = nil
+      Shoes.app do
+        message = "Choose which record from:\n#{contact.show}\nto replace in\n#{duplicate.show}"
+        changes = ask(message)
+        user_changes = changes == nil ? [] : changes.split(" ").map { |record| record.to_sym }
+        until (user_changes - contact.parameters).size == 0 and !user_changes.empty?
+          alert "Some parameters are incorrect: #{user_changes.join(", ").to_s}"
+          changes = ask(message)
+          user_changes = changes == nil ? [] : changes.split(" ").map { |record| record.to_sym }
+        end
+      # close
+      end
+      extract_records(duplicate, contact, user_changes)
     else
       collision_handler(duplicate, contact, user_option)
     end
