@@ -15,7 +15,21 @@ require "green_shoes"
     @nav = @app.flow do
 
       @app.button "Create" do
-        @app.alert @e.text
+        if @e.text == ""
+          @app.alert "Enter name for phone book please"
+        elsif @menagers[@e.text] != nil
+          @app.alert "Phone book #{@e.text} is already loaded"
+        else
+          @name = @e.text
+          @menagers[@e.text] = PhoneBook.new
+          @current_phone_book = @menagers[@name]
+            @app.append do
+              @contact_list = @app.stack do
+              add_book(@current_phone_book, @name)
+              end
+            end
+            @e.text = ""
+        end
       end
 
       @e = @app.edit_line :width => 350, :height => 25
